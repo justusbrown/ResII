@@ -31,32 +31,66 @@ xlim([min(price)*.6 max(price)*1.2]);
 ylim([min(wells)*.6 max(wells)*1.2]);
 hold on
 plot(price,upper)
+plot(best)
 plot(price,lower)
-
+hold off
 %%
-%this calls the linear models and gives the value of num of wells for a
-%given wti
+%The algorithm
+
 n=length(price);
-[top]=upperGandJ(1200,best,up);
-[bottom]=lowerGandJ(1200,best,low);
+initPrice=price(n);
+initRig=wells(n);
+
+iter=0;
+i=0;
+c0();
+c1();
+c2();
+c3();
+
+%For realization=1:12000000
 [e,a,b]=randGandJ();
-delta=b-a;
 
-initPrice=price(n)
-initRig=wells(n)
+while sum(Tot_Time) <= 60 && iter<10000000
 
-%distance from model to top
-updist=upperGandJ(initPrice, best, up)-initRig
-downdist=lowerGandJ(initPrice,best,low)-initRig
+iter=iter+1;
+i=i+1;
+c0(i)=initPrice;
+
+    
+if (b-a)>0
+    c1(i)=upperGandJ(c0, best, up);
+    updist=c1(i)-c0(i);
+    c2(i)=c1(i)+updist*e;
+    Tot_Time(i)=Total_TimeGandJ(c0,c1,c2,b,a,i);
+    option=1;
+else
+    c1(i)=lowerGandJ(c0,best,low);
+    downdist=c1(i)-c0(i);
+    c2(i)=c1(i)+downdist*e;
+    Tot_Time(i)=Total_TimeGandJ(c0,c1,c2,b,a,i);
+    option=2;
+%else (b-a)=0 %What do we do here???
+    %c1(i)
+end
+if option==1 %may need to add an option for b-a=a or should we just say it can't be
+    range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
+    range_l=(c1(i)-best.Coefficients.Estimate(1)-low)/best.Coefficients.Estimate(2);
+    range_u=(c1(i)+200);
+    range_d=(c1(i)-200);
+    %need to subset the data given this box
+else 
+    range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
+    range_r=(c1(i)-best.Coefficients.Estimate(1)-up)/best.Coefficients.Estimate(2);
+    range_u=(c1(i)+200);
+    range_d=(c1(i)-200);
+    %need to subset the data given this box
+end
+%once subsetted need to find a random point within the box to call the new
+%c0 
 
 
-
-priceincrease=[initPrice:upperGandJ(initRig, best, up)]'
-assoc_rigs=repmat(initRig, length(priceincrease))
-plot(priceincrease, assoc.rigs)
-%Starting from initial condition, use the net wells added each find 
-%(march along vertical direction (constant price) and continue until
-% you reach to the upper/lower band) to find the time required to 
-%reach the limiting border. Mark down the intersection point as c1
+c0(i+1)=c3(i);
+end
 
 
