@@ -43,14 +43,12 @@ initRig=wells(n);
 
 iter=0;
 i=0;
-c0();
-c1();
-c2();
-c3();
 
 %For realization=1:12000000
 [e,a,b]=randGandJ();
-
+Tot_Time=0;
+iter=0;
+i=0;
 while sum(Tot_Time) <= 60 && iter<10000000
 
 iter=iter+1;
@@ -71,25 +69,24 @@ else
     Tot_Time(i)=Total_TimeGandJ(c0,c1,c2,b,a,i);
     option=2;
 end
-if option==2 %may need to add an option for b-a=a or should we just say it can't be
+if option==1 %upper half
     range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
-    range_l=(c1(i)-best.Coefficients.Estimate(1)-low)/best.Coefficients.Estimate(2);
+    range_r=(c1(i)-best.Coefficients.Estimate(1)-low)/best.Coefficients.Estimate(2);
     range_u=(c1(i)+200);
     range_d=(c1(i)-200);
-    sam=hist.
-    %need to subset the data given this box
-else 
+    sam=hist.ActiveWells<range_u & hist.ActiveWells>range_d & hist.OilPrice_WTI_<range_r & hist.OilPrice_WTI_>range_c;
+    sam=hist.OilPrice_WTI_(sam);
+    c3=datasample(sam,1);
+else  %lower half
     range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
-    range_r=(c1(i)-best.Coefficients.Estimate(1)-up)/best.Coefficients.Estimate(2);
+    range_l=(c1(i)-best.Coefficients.Estimate(1)-up)/best.Coefficients.Estimate(2);
     range_u=(c1(i)+200);
     range_d=(c1(i)-200);
-    %need to subset the data given this box
+    sam=hist.ActiveWells<range_u & hist.ActiveWells>range_d & hist.OilPrice_WTI_>range_l & hist.OilPrice_WTI_<range_c;
+    sam=hist.OilPrice_WTI_(sam);
+    c3=datasample(sam,1);
 end
-%once subsetted need to find a random point within the box to call the new
-%c0 
-
-
-c0(i+1)=c3(i);
+c0(i+1)=c3;%why is the inputing a zero and the sample number??
 end
 
 
