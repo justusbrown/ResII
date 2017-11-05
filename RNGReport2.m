@@ -58,7 +58,7 @@ i=i+1;
 c0(i)=initPrice;
 
     
-if (b-a)>0
+if (a-b)>0
     c1(i)=upperGandJ(c0, best, up);
     updist=c1(i)-c0(i);
     c2(i)=c1(i)+updist*e;
@@ -70,14 +70,13 @@ else
     c2(i)=c1(i)+downdist*e;
     Tot_Time(i)=Total_TimeGandJ(c0,c1,c2,b,a,i);
     option=2;
-%else (b-a)=0 %What do we do here???
-    %c1(i)
 end
-if option==1 %may need to add an option for b-a=a or should we just say it can't be
+if option==2 %may need to add an option for b-a=a or should we just say it can't be
     range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
     range_l=(c1(i)-best.Coefficients.Estimate(1)-low)/best.Coefficients.Estimate(2);
     range_u=(c1(i)+200);
     range_d=(c1(i)-200);
+    sam=hist.
     %need to subset the data given this box
 else 
     range_c=(c1(i)-best.Coefficients.Estimate(1))/best.Coefficients.Estimate(2);
